@@ -8,6 +8,9 @@
     </head>
 
     <body>
+        
+        {{-- ナビゲーションバー --}}
+        @include('commons.navbar')
 
 
         <div class="container">

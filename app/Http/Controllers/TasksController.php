@@ -19,7 +19,7 @@ class TasksController extends Controller
         $tasks = Task::all();
         
         // メッセージ一覧ビューでそれを表示
-        return view('tasks.index', ['tasks' => $tasks]);
+        return view('tasks.index', ['tasks' => $tasks, ]);
     }
 
     /**
@@ -114,7 +114,7 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        // idの値でメッセージを検索して取得
+        // idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
         // タスクを削除
         $task->delete();
