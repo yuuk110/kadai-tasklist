@@ -15,11 +15,16 @@ class TasksController extends Controller
      */
     public function index()
     {
-        // getでmessages/にアクセスされた場合の「一覧表示処理」
-        $tasks = Task::all();
-        
-        // メッセージ一覧ビューでそれを表示
-        return view('tasks.index', ['tasks' => $tasks, ]);
+        $data = [];
+        if (\Auth::check()) {
+                $user = \Auth::user();
+                $tasks = $user->tasks()->orderBy('created_at' , 'desc')->paginate(10);
+                $data = [
+                    'user' => $user,
+                    'tasks' => $tasks,
+                ];
+        }
+        return view('tasks.index', $data );
     }
 
     /**
@@ -29,11 +34,12 @@ class TasksController extends Controller
      */
     public function create()
     {
-        $task = new Task;
-        // メッセージ作成ビューを表示
+       $task = new Task;
+
         return view('tasks.create', [
             'task' => $task,
         ]);
+        return redirect('/');
     }
 
     /**
@@ -50,6 +56,7 @@ class TasksController extends Controller
         ]);
         // メッセージを作成
         $task = new Task;
+        $task->user_id = $request->user()->id;
         $task->content = $request->content;
         $task->status = $request->status;
         $task->save();
@@ -66,13 +73,17 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        // idの値でメッセージを検索して取得
-        $task = Task::findOrFail($id);
+        $task = \App\Task::find($id);
         
-        //  メッセージ詳細ビューでそれを表示
-        return view('tasks.show', [
-            'task' => $task,
+        if (\Auth::check() == $task->user_id) {
+                $task = Task::find($id);
+
+                return view('tasks.show', [
+                'task' => $task,
             ]);
+            return redirect('/');
+        }
+        return redirect('/');
     }
 
     /**
@@ -83,13 +94,17 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
+         $task = \App\Task::find($id);
         
-        // タスク編集ビューでそれを表示
-        return view('tasks.edit', [
-               'task' => $task,
+        if (\Auth::id() === $task->user_id) {
+            $task = Task::find($id);
+
+            return view('tasks.edit', [
+                'task' => $task,
             ]);
+            return redirect('/');
+        }
+        return redirect('/');
     }
 
     /**
@@ -124,12 +139,14 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
-        // タスクを削除
-        $task->delete();
+        $task = \App\Task::find($id);
         
-        // トップページへリダイレクトさせる
+        if (\Auth::id() === $task->user_id) {
+            $task = Task::find($id);
+            $task->delete();
+            
+            return redirect('/');
+        }
         return redirect('/');
     }
 }
