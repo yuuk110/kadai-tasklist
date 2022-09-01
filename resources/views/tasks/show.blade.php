@@ -21,7 +21,8 @@
         </tr>
     </table>
     {!! link_to_route('tasks.edit', 'このタスクを編集', ['task' => $task->id], ['class' => 'btn btn-light']) !!}
-
+    
+    {!! Form::model($task, ['route' => ['tasks.show', $task->id], 'method' => 'show']) !!}
     {!! Form::model($task, ['route' => ['tasks.destroy', $task->id], 'method' => 'delete']) !!}
         {!! Form::submit('削除', ['class' => 'btn btn-danger']) !!}
     {!! Form::close() !!}
@@ -33,3 +34,4 @@
             </div>
         </div>
 @endif
+@endsection
